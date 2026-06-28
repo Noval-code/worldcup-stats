@@ -26,6 +26,10 @@ export interface Match {
   id: string
   homeTeam: string
   awayTeam: string
+  homeTeamName?: string
+  awayTeamName?: string
+  homeTeamFlag?: string
+  awayTeamFlag?: string
   homeScore: number | null
   awayScore: number | null
   date: string
@@ -47,6 +51,8 @@ export interface MatchEvent {
 
 export interface Standing {
   team: string
+  teamName?: string
+  teamFlag?: string
   group: string
   played: number
   won: number

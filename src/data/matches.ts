@@ -39,7 +39,7 @@ export const matches: Match[] = [
     { minute: 37, type: 'goal', player: 'L. Modrić', team: 'home', detail: 'Kovačić assist' },
     { minute: 68, type: 'goal', player: 'C. Pulisic', team: 'away', detail: 'Penalty' },
   ]},
-  { id: 'm9', homeTeam: 'esp', awayTeam: 'aus', homeScore: 3, awayScore: 1, date: '2026-06-16', time: '17:00', stadium: 'Allegiant Stadium', stage: 'group', group: 'E', status: 'finished', events: [
+  { id: 'm9', homeTeam: 'esp', awayTeam: 'australia', homeScore: 3, awayScore: 1, date: '2026-06-16', time: '17:00', stadium: 'Allegiant Stadium', stage: 'group', group: 'E', status: 'finished', events: [
     { minute: 8, type: 'goal', player: 'L. Yamal', team: 'home', detail: 'Pedri assist' },
     { minute: 34, type: 'goal', player: 'A. Morata', team: 'home', detail: 'Nico Williams assist' },
     { minute: 51, type: 'goal', player: 'M. Boyle', team: 'away', detail: 'Goodwin assist' },
@@ -110,7 +110,7 @@ export const matches: Match[] = [
   { id: 'm23', homeTeam: 'eng', awayTeam: 'cro', homeScore: 2, awayScore: 0, date: '2026-06-25', time: '16:00', stadium: 'Levi\'s Stadium', stage: 'group', group: 'D', status: 'upcoming', events: []},
   { id: 'm24', homeTeam: 'usa', awayTeam: 'cmr', homeScore: null, awayScore: null, date: '2026-06-25', time: '20:00', stadium: 'Allegiant Stadium', stage: 'group', group: 'D', status: 'upcoming', events: []},
   { id: 'm25', homeTeam: 'esp', awayTeam: 'ger', homeScore: null, awayScore: null, date: '2026-06-26', time: '17:00', stadium: 'Arrowhead Stadium', stage: 'group', group: 'E', status: 'upcoming', events: []},
-  { id: 'm26', homeTeam: 'kor', awayTeam: 'aus', homeScore: null, awayScore: null, date: '2026-06-26', time: '20:00', stadium: 'Estadio BBVA', stage: 'group', group: 'E', status: 'upcoming', events: []},
+  { id: 'm26', homeTeam: 'kor', awayTeam: 'australia', homeScore: null, awayScore: null, date: '2026-06-26', time: '20:00', stadium: 'Estadio BBVA', stage: 'group', group: 'E', status: 'upcoming', events: []},
   { id: 'm27', homeTeam: 'bel', awayTeam: 'uru', homeScore: null, awayScore: null, date: '2026-06-27', time: '16:00', stadium: 'Estadio Azteca', stage: 'group', group: 'F', status: 'upcoming', events: []},
   { id: 'm28', homeTeam: 'mex2', awayTeam: 'irn', homeScore: null, awayScore: null, date: '2026-06-27', time: '20:00', stadium: 'Rose Bowl', stage: 'group', group: 'F', status: 'upcoming', events: []},
   { id: 'm29', homeTeam: 'ita', awayTeam: 'den', homeScore: null, awayScore: null, date: '2026-06-28', time: '17:00', stadium: 'Estadio Guadalajara', stage: 'group', group: 'G', status: 'upcoming', events: []},

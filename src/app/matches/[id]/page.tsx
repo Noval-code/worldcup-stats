@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation'
-import { getMatch } from '@/data/matches'
-import { getTeam } from '@/data/teams'
+import { getOneMatch, resolveTeamName } from '@/lib/data-service'
 import MatchTimeline from '@/components/MatchTimeline'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
@@ -16,13 +15,21 @@ const stageLabels: Record<string, string> = {
 
 export default async function MatchDetailPage(props: PageProps<'/matches/[id]'>) {
   const { id } = await props.params
-  const match = getMatch(id)
+  const match = await getOneMatch(id)
   if (!match) notFound()
 
-  const home = getTeam(match.homeTeam)
-  const away = getTeam(match.awayTeam)
+  const home = resolveTeamName(match.homeTeam)
+  const away = resolveTeamName(match.awayTeam)
   const isFinished = match.status === 'finished'
   const isLive = match.status === 'live'
+
+  function TeamFlag({ flag }: { flag: string }) {
+    if (flag.startsWith('http')) {
+      // eslint-disable-next-line @next/next/no-img-element
+      return <img src={flag} alt="" className="w-16 h-12 md:w-20 md:h-14 object-cover rounded-lg inline-block" />
+    }
+    return <span className="text-5xl md:text-6xl">{flag}</span>
+  }
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
@@ -41,10 +48,10 @@ export default async function MatchDetailPage(props: PageProps<'/matches/[id]'>)
           </div>
         </div>
 
-        <div className="flex items-center justify-center gap-6 md:gap-12 py-8">
+        <div className="flex items-center justify-center gap-4 md:gap-12 py-8">
           <div className="text-center">
-            <span className="text-5xl md:text-6xl">{home?.flag}</span>
-            <p className="text-sm font-semibold text-white mt-2">{home?.name}</p>
+            <TeamFlag flag={home.flag} />
+            <p className="text-sm font-semibold text-white mt-2">{home.name}</p>
           </div>
           <div className="text-center">
             {isFinished || isLive ? (
@@ -59,8 +66,8 @@ export default async function MatchDetailPage(props: PageProps<'/matches/[id]'>)
             )}
           </div>
           <div className="text-center">
-            <span className="text-5xl md:text-6xl">{away?.flag}</span>
-            <p className="text-sm font-semibold text-white mt-2">{away?.name}</p>
+            <TeamFlag flag={away.flag} />
+            <p className="text-sm font-semibold text-white mt-2">{away.name}</p>
           </div>
         </div>
 

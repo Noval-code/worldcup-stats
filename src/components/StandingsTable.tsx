@@ -1,6 +1,13 @@
 import { Standing } from '@/lib/types'
 import { getTeam } from '@/data/teams'
 
+function resolveTeam(s: Standing): { name: string; flag: string } {
+  if (s.teamName && s.teamFlag) return { name: s.teamName, flag: s.teamFlag }
+  const team = getTeam(s.team)
+  if (team) return { name: team.name, flag: team.flag }
+  return { name: s.team, flag: '🏳️' }
+}
+
 export default function StandingsTable({ standings, group }: { standings: Standing[]; group: string }) {
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
@@ -25,14 +32,18 @@ export default function StandingsTable({ standings, group }: { standings: Standi
           </thead>
           <tbody>
             {standings.map((s, i) => {
-              const team = getTeam(s.team)
+              const team = resolveTeam(s)
               return (
                 <tr key={s.team} className={`border-b border-zinc-800/50 ${i < 2 ? 'bg-green-950/20' : ''}`}>
                   <td className="px-3 py-2.5 text-zinc-500">{i + 1}</td>
                   <td className="px-3 py-2.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-lg">{team?.flag}</span>
-                      <span className="font-medium text-white">{team?.name}</span>
+                      {team.flag.startsWith('http') ? (
+                        <img src={team.flag} alt="" className="w-6 h-4 object-cover rounded" />
+                      ) : (
+                        <span className="text-lg">{team.flag}</span>
+                      )}
+                      <span className="font-medium text-white">{team.name}</span>
                     </div>
                   </td>
                   <td className="px-3 py-2.5 text-center text-zinc-300">{s.played}</td>

@@ -11,9 +11,40 @@ const stageLabels: Record<string, string> = {
   final: 'Final',
 }
 
+function resolveTeam(id: string, name?: string, flag?: string): { name: string; flag: string } {
+  if (name && flag) return { name, flag }
+
+  const team = getTeam(id)
+  if (team) return { name: team.name, flag: team.flag }
+
+  const labels: Record<string, string> = {
+    winnerA: 'Juara Grup A', runnerA: 'Runner-up Grup A',
+    winnerB: 'Juara Grup B', runnerB: 'Runner-up Grup B',
+    winnerC: 'Juara Grup C', runnerC: 'Runner-up Grup C',
+    winnerD: 'Juara Grup D', runnerD: 'Runner-up Grup D',
+    winnerE: 'Juara Grup E', runnerE: 'Runner-up Grup E',
+    winnerF: 'Juara Grup F', runnerF: 'Runner-up Grup F',
+    winnerG: 'Juara Grup G', runnerG: 'Runner-up Grup G',
+    winnerH: 'Juara Grup H', runnerH: 'Runner-up Grup H',
+    winnerR1: 'Pemenang 1', winnerR2: 'Pemenang 2',
+    winnerR3: 'Pemenang 3', winnerR4: 'Pemenang 4',
+    winnerR5: 'Pemenang 5', winnerR6: 'Pemenang 6',
+    winnerR7: 'Pemenang 7', winnerR8: 'Pemenang 8',
+    winnerQF1: 'Pemenang QF 1', winnerQF2: 'Pemenang QF 2',
+    winnerQF3: 'Pemenang QF 3', winnerQF4: 'Pemenang QF 4',
+    winnerSF1: 'Pemenang SF 1', winnerSF2: 'Pemenang SF 2',
+    loserSF1: 'Kalah SF 1', loserSF2: 'Kalah SF 2',
+  }
+
+  const labelMatch = id.match(/^label_(.+)$/)
+  if (labelMatch) return { name: labelMatch[1].replace(/_/g, ' '), flag: '🏳️' }
+
+  return { name: labels[id] || name || 'TBD', flag: flag || '🏳️' }
+}
+
 export default function MatchCard({ match }: { match: Match }) {
-  const home = getTeam(match.homeTeam)
-  const away = getTeam(match.awayTeam)
+  const home = resolveTeam(match.homeTeam, match.homeTeamName, match.homeTeamFlag)
+  const away = resolveTeam(match.awayTeam, match.awayTeamName, match.awayTeamFlag)
 
   const isLive = match.status === 'live'
   const isFinished = match.status === 'finished'
@@ -35,8 +66,12 @@ export default function MatchCard({ match }: { match: Match }) {
 
         <div className="flex items-center gap-3">
           <div className="flex-1 flex items-center justify-end gap-2 text-right">
-            <span className="text-sm font-semibold text-white">{home?.name || match.homeTeam}</span>
-            <span className="text-2xl">{home?.flag}</span>
+            <span className="text-sm font-semibold text-white">{home.name}</span>
+            {home.flag.startsWith('http') ? (
+              <img src={home.flag} alt="" className="w-7 h-5 object-cover rounded" />
+            ) : (
+              <span className="text-2xl">{home.flag}</span>
+            )}
           </div>
 
           <div className="flex items-center gap-2 px-4">
@@ -50,8 +85,12 @@ export default function MatchCard({ match }: { match: Match }) {
           </div>
 
           <div className="flex-1 flex items-center gap-2">
-            <span className="text-2xl">{away?.flag}</span>
-            <span className="text-sm font-semibold text-white">{away?.name || match.awayTeam}</span>
+            {away.flag.startsWith('http') ? (
+              <img src={away.flag} alt="" className="w-7 h-5 object-cover rounded" />
+            ) : (
+              <span className="text-2xl">{away.flag}</span>
+            )}
+            <span className="text-sm font-semibold text-white">{away.name}</span>
           </div>
         </div>
 
