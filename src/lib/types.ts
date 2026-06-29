@@ -67,6 +67,8 @@ export interface Standing {
 export interface TopScorer {
   player: string
   team: string
+  teamName?: string
+  teamFlag?: string
   goals: number
   assists: number
   matchesPlayed: number

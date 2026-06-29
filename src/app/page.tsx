@@ -1,8 +1,9 @@
-import { Calendar, Trophy, Users, Goal, WifiOff } from 'lucide-react'
+import { Calendar, Trophy, Users, Goal } from 'lucide-react'
 import MatchCard from '@/components/MatchCard'
 import StandingsTable from '@/components/StandingsTable'
+import TopScorerCard from '@/components/TopScorerCard'
 import NewsCard from '@/components/NewsCard'
-import { getAllMatches, getAllStandings, getTopScorers, getNews, resolveTeamName } from '@/lib/data-service'
+import { getAllMatches, getAllStandings, getTopScorers, getNews } from '@/lib/data-service'
 import Link from 'next/link'
 
 async function getGroups() {
@@ -118,20 +119,10 @@ export default async function Home() {
           <h2 className="text-lg font-bold text-white flex items-center gap-2"><Goal className="w-5 h-5 text-yellow-400" /> Top Skor</h2>
           <Link href="/top-scorers" className="text-xs text-yellow-400 hover:underline">Lihat semua</Link>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {topScorers.slice(0, 4).map((s, i) => {
-            const team = resolveTeamName(s.team)
-            return (
-              <div key={s.player} className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-center gap-3">
-                <span className="text-lg font-bold text-zinc-600">{i + 1}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-white truncate">{s.player}</p>
-                  <p className="text-xs text-zinc-500">{team.flag.startsWith('http') ? <img src={team.flag} alt="" className="w-4 h-3 inline object-cover rounded" /> : team.flag} {team.name}</p>
-                </div>
-                <p className="text-2xl font-bold text-yellow-400">{s.goals}</p>
-              </div>
-            )
-          })}
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          {topScorers.slice(0, 4).map((s, i) => (
+            <TopScorerCard key={s.player} scorer={s} rank={i + 1} />
+          ))}
           {topScorers.length === 0 && <p className="text-zinc-600 text-sm col-span-4 text-center py-8">Belum ada data</p>}
         </div>
       </section>

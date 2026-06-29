@@ -107,7 +107,7 @@ export async function getAPIStandings(): Promise<Standing[]> {
 
 export async function getAPITopScorers(): Promise<TopScorer[]> {
   const matches = await getAPIMatches()
-  const scorerMap = new Map<string, { goals: number; assists: number; matches: Set<string>; penalty: boolean }>()
+  const scorerMap = new Map<string, { goals: number; assists: number; matches: Set<string>; penalty: boolean; team: string; teamName: string; teamFlag: string }>()
 
   for (const m of matches) {
     if (!m.events?.length) continue
@@ -115,7 +115,8 @@ export async function getAPITopScorers(): Promise<TopScorer[]> {
       if (e.type !== 'goal') continue
       const name = e.player
       if (!scorerMap.has(name)) {
-        scorerMap.set(name, { goals: 0, assists: 0, matches: new Set(), penalty: false })
+        const teamId = e.team === 'home' ? m.homeTeam : m.awayTeam
+        scorerMap.set(name, { goals: 0, assists: 0, matches: new Set(), penalty: false, team: teamId, teamName: '', teamFlag: '' })
       }
       const s = scorerMap.get(name)!
       s.goals++
@@ -127,7 +128,9 @@ export async function getAPITopScorers(): Promise<TopScorer[]> {
   return Array.from(scorerMap.entries())
     .map(([player, stats]) => ({
       player,
-      team: '',
+      team: stats.team,
+      teamName: stats.teamName,
+      teamFlag: stats.teamFlag,
       goals: stats.goals,
       assists: stats.assists,
       matchesPlayed: stats.matches.size,
