@@ -6,14 +6,13 @@ import { topScorers as staticTopScorers } from '@/data/topscorers'
 import { teams as staticTeams } from '@/data/teams'
 import { news } from '@/data/news'
 import { getTeam } from '@/data/teams'
+import { getPlayerImage } from './player-images'
 
-let apiLoaded = false
 let apiTeams: Map<string, Team> = new Map()
 
 export async function getAllMatches(): Promise<Match[]> {
   const api = await getAPIMatches()
   if (api.length > 0) {
-    apiLoaded = true
     const teams = await getAPITeams()
     apiTeams = teams
     return api
@@ -33,11 +32,23 @@ export async function getAllStandings(): Promise<Standing[]> {
 }
 
 export async function getTopScorers(): Promise<TopScorer[]> {
-  if (apiLoaded) {
-    const api = await getAPITopScorers()
-    if (api.length > 0) return api
+  const api = await getAPITopScorers()
+  if (api.length > 0) {
+    const withImages = await Promise.all(
+      api.map(async (s) => {
+        const img = await getPlayerImage(s.player)
+        return { ...s, imageUrl: img || undefined }
+      })
+    )
+    return withImages
   }
-  return staticTopScorers
+  const withImages = await Promise.all(
+    staticTopScorers.map(async (s) => {
+      const img = await getPlayerImage(s.player)
+      return { ...s, imageUrl: img || undefined }
+    })
+  )
+  return withImages
 }
 
 export function getNews(): NewsItem[] {

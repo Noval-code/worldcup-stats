@@ -69,6 +69,7 @@ export interface TopScorer {
   team: string
   teamName?: string
   teamFlag?: string
+  imageUrl?: string
   goals: number
   assists: number
   matchesPlayed: number

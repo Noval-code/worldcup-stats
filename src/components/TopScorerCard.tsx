@@ -1,10 +1,6 @@
 import { TopScorer } from '@/lib/types'
 import { getTeam } from '@/data/teams'
 
-function avatarUrl(name: string) {
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=48&bold=true`
-}
-
 function resolveTeam(scorer: TopScorer): { name: string; flag: string } {
   if (scorer.teamName && scorer.teamFlag) return { name: scorer.teamName, flag: scorer.teamFlag }
   const team = getTeam(scorer.team)
@@ -21,11 +17,15 @@ export default function TopScorerCard({ scorer, rank }: { scorer: TopScorer; ran
         {rank <= 3 ? ['🥇', '🥈', '🥉'][rank - 1] : rank}
       </span>
 
-      <img
-        src={avatarUrl(scorer.player)}
-        alt={scorer.player}
-        className="w-10 h-10 rounded-full bg-zinc-700 flex-shrink-0"
-      />
+      <div className="w-10 h-10 rounded-full bg-zinc-800 flex-shrink-0 overflow-hidden">
+        {scorer.imageUrl ? (
+          <img src={scorer.imageUrl} alt={scorer.player} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-sm font-bold text-zinc-500">
+            {scorer.player.charAt(0)}
+          </div>
+        )}
+      </div>
 
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-white truncate">{scorer.player}</p>
