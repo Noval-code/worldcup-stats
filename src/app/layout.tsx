@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import "./globals.css"
 import Navbar from "@/components/Navbar"
+import AutoRefresh from "@/components/AutoRefresh"
 
 export const metadata: Metadata = {
   title: "WorldCup 2026 - Statistik Bola",
@@ -16,6 +17,7 @@ export default function RootLayout({
     <html lang="id" className="h-full antialiased">
       <body className="min-h-full bg-zinc-950 text-zinc-100 flex flex-col">
         <Navbar />
+        <AutoRefresh interval={30000} />
         <main className="flex-1">{children}</main>
         <footer className="border-t border-zinc-800 py-6 mt-12">
           <div className="max-w-7xl mx-auto px-4 text-center text-xs text-zinc-700">
