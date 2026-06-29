@@ -1,18 +1,23 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import { getTeam } from '@/data/teams'
-import { matches } from '@/data/matches'
-import { standings } from '@/data/standings'
+import { getOneTeam, getAllStandings, getAllMatches } from '@/lib/data-service'
 import MatchCard from '@/components/MatchCard'
 
 export default async function TeamDetailPage(props: PageProps<'/teams/[id]'>) {
   const { id } = await props.params
-  const team = getTeam(id)
+  const team = await getOneTeam(id)
   if (!team) notFound()
 
-  const standing = standings.find(s => s.team === id)
-  const teamMatches = matches.filter(m => m.homeTeam === id || m.awayTeam === id)
+  const [standings, matches] = await Promise.all([
+    getAllStandings(),
+    getAllMatches(),
+  ])
+
+  const standing = standings.find(s => s.team === team.id)
+  const teamMatches = matches.filter(m => m.homeTeam === team.id || m.awayTeam === team.id)
+
+  const flagIsUrl = team.flag.startsWith('http')
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
@@ -22,15 +27,21 @@ export default async function TeamDetailPage(props: PageProps<'/teams/[id]'>) {
 
       <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 md:p-8 mb-6">
         <div className="flex items-center gap-4">
-          <span className="text-5xl">{team.flag}</span>
+          {flagIsUrl ? (
+            <img src={team.flag} alt="" className="w-14 h-10 object-cover rounded" />
+          ) : (
+            <span className="text-5xl">{team.flag}</span>
+          )}
           <div>
             <h1 className="text-2xl font-bold text-white">{team.name}</h1>
             <div className="flex items-center gap-3 mt-1 text-sm text-zinc-500">
               <span>Grup {team.group}</span>
-              <span>•</span>
-              <span>Pelatih: {team.coach}</span>
-              <span>•</span>
-              <span>FIFA Rank: #{team.rank}</span>
+              {team.coach && (
+                <><span>•</span><span>Pelatih: {team.coach}</span></>
+              )}
+              {team.rank > 0 && (
+                <><span>•</span><span>FIFA Rank: #{team.rank}</span></>
+              )}
             </div>
           </div>
         </div>

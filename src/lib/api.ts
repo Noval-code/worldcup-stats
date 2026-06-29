@@ -105,38 +105,85 @@ export async function getAPIStandings(): Promise<Standing[]> {
   return result
 }
 
+function normalizeName(name: string): string {
+  let n = name.trim()
+  n = n.replace(/\s+/g, ' ')
+  const parts = n.split(' ')
+  if (parts.length >= 2 && parts[0].endsWith('.')) {
+    parts.shift()
+    n = parts.join(' ')
+  }
+  return n
+}
+
+function getSurname(name: string): string {
+  const parts = name.trim().split(/\s+/)
+  return parts[parts.length - 1].toLowerCase()
+}
+
+function isSimilar(a: string, b: string): boolean {
+  const aNorm = normalizeName(a).toLowerCase()
+  const bNorm = normalizeName(b).toLowerCase()
+  if (aNorm === bNorm) return true
+  if (aNorm.includes(bNorm) || bNorm.includes(aNorm)) return true
+  if (getSurname(a) === getSurname(b) && getSurname(a).length > 2) return true
+  return false
+}
+
 export async function getAPITopScorers(): Promise<TopScorer[]> {
   const matches = await getAPIMatches()
-  const scorerMap = new Map<string, { goals: number; assists: number; matches: Set<string>; penalty: boolean; team: string; teamName: string; teamFlag: string }>()
+  const scorerEntries: { name: string; team: string; penalty: boolean; matchId: string }[] = []
 
   for (const m of matches) {
     if (!m.events?.length) continue
     for (const e of m.events) {
       if (e.type !== 'goal') continue
-      const name = e.player
-      if (!scorerMap.has(name)) {
-        const teamId = e.team === 'home' ? m.homeTeam : m.awayTeam
-        scorerMap.set(name, { goals: 0, assists: 0, matches: new Set(), penalty: false, team: teamId, teamName: '', teamFlag: '' })
-      }
-      const s = scorerMap.get(name)!
-      s.goals++
-      s.matches.add(m.id)
-      if (e.detail?.toLowerCase().includes('penalty')) s.penalty = true
+      const teamId = e.team === 'home' ? m.homeTeam : m.awayTeam
+      scorerEntries.push({
+        name: e.player.trim(),
+        team: teamId,
+        penalty: e.detail?.toLowerCase().includes('penalty') || false,
+        matchId: m.id,
+      })
     }
   }
 
-  return Array.from(scorerMap.entries())
+  const merged = new Map<string, { goals: number; matches: Set<string>; penalty: boolean; team: string }>()
+
+  for (const entry of scorerEntries) {
+    let foundKey: string | null = null
+    for (const key of merged.keys()) {
+      if (isSimilar(key, entry.name)) {
+        foundKey = key
+        break
+      }
+    }
+    const useKey = foundKey || entry.name
+    if (!merged.has(useKey)) {
+      merged.set(useKey, { goals: 0, matches: new Set(), penalty: false, team: entry.team })
+    }
+    const s = merged.get(useKey)!
+    s.goals++
+    s.matches.add(entry.matchId)
+    if (entry.penalty) s.penalty = true
+    if (entry.name.length > useKey.length) {
+      merged.delete(useKey)
+      merged.set(entry.name, s)
+    }
+  }
+
+  return Array.from(merged.entries())
     .map(([player, stats]) => ({
       player,
       team: stats.team,
-      teamName: stats.teamName,
-      teamFlag: stats.teamFlag,
+      teamName: '',
+      teamFlag: '',
       goals: stats.goals,
-      assists: stats.assists,
+      assists: 0,
       matchesPlayed: stats.matches.size,
       penalty: stats.penalty,
     }))
-    .sort((a, b) => b.goals - a.goals)
+    .sort((a, b) => b.goals - a.goals || b.matchesPlayed - a.matchesPlayed)
     .slice(0, 50)
 }
 

@@ -17,7 +17,7 @@ export default async function Home() {
     getAllMatches(),
     getGroups(),
     getTopScorers(),
-    Promise.resolve(getNews()),
+    getNews(),
   ])
 
   const liveMatches = matches.filter(m => m.status === 'live')
