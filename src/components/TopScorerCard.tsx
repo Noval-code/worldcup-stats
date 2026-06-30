@@ -44,7 +44,7 @@ export default function TopScorerCard({ scorer, rank }: { scorer: TopScorer; ran
         <p className="text-[9px] text-zinc-600">Gol</p>
       </div>
 
-      <div className="text-center px-2 hidden sm:block">
+      <div className="text-center px-2">
         <p className="text-sm font-semibold text-zinc-400">{scorer.assists}</p>
         <p className="text-[9px] text-zinc-600">Assist</p>
       </div>

@@ -49,6 +49,14 @@ function getSurname(name: string): string {
   return parts[parts.length - 1].toLowerCase()
 }
 
+function stripInitial(s: string): string {
+  const parts = s.trim().split(/\s+/)
+  if (parts.length >= 2 && /^[a-z]\.?$/i.test(parts[0])) {
+    return parts.slice(1).join(' ')
+  }
+  return s
+}
+
 function nameMatch(a: string, b: string): boolean {
   const na = normalizeForMatch(a)
   const nb = normalizeForMatch(b)
@@ -57,6 +65,12 @@ function nameMatch(a: string, b: string): boolean {
   const sa = getSurname(na)
   const sb = getSurname(nb)
   if (sa === sb && sa.length > 2) return true
+
+  const aFull = normalizeForMatch(stripInitial(a))
+  const bFull = normalizeForMatch(stripInitial(b))
+  if (aFull === bFull) return true
+  if (aFull.includes(bFull) || bFull.includes(aFull)) return true
+
   return false
 }
 
@@ -67,6 +81,7 @@ export async function getTopScorers(): Promise<TopScorer[]> {
       const apiMatch = api.find(a => nameMatch(a.player, st.player))
       return {
         ...st,
+        assists: st.assists,
         goals: apiMatch?.goals ?? st.goals,
         team: apiMatch?.team ?? st.team,
         penalty: apiMatch?.penalty ?? st.penalty,
@@ -76,7 +91,17 @@ export async function getTopScorers(): Promise<TopScorer[]> {
     for (const a of api) {
       const exists = merged.some(m => nameMatch(m.player, a.player))
       if (!exists) {
-        merged.push({ ...a, assists: 0, matchesPlayed: a.matchesPlayed })
+        const staticMatch = staticTopScorers.find(st => nameMatch(st.player, a.player))
+        merged.push({
+          player: a.player,
+          team: staticMatch?.team ?? a.team,
+          teamName: staticMatch?.teamName ?? a.teamName ?? '',
+          teamFlag: staticMatch?.teamFlag ?? a.teamFlag ?? '',
+          goals: a.goals,
+          assists: staticMatch?.assists ?? 0,
+          matchesPlayed: a.matchesPlayed,
+          penalty: a.penalty,
+        })
       }
     }
 
